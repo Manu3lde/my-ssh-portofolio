@@ -1,0 +1,16 @@
+{
+  "name": "my-ssh-portfolio",
+  "version": "0.0.1",
+  "description": "Terminal-based portfolio with React and Ink",
+  "type": "module",
+  "main": "cli.js",
+  "scripts": {
+    "start": "node cli.js",
+    "dev": "node cli.js"
+  },
+  "dependencies": {
+    "ink": "^5.0.0",
+    "ink-spinner": "^5.0.0",
+    "react": "^18.2.0"
+  }
+}

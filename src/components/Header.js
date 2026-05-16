@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text } from "ink";
-// import Marquee from "./Marquee.js";
+import Marquee from "./Marquee.js";
 
 const ACCENT = "#FF5F00";
 
@@ -28,6 +28,6 @@ export default function Header({ activeTab }) {
         active: activeTab === "links",
       }),
     ),
-    // React.createElement(Marquee),
+    React.createElement(Marquee),
   );
 }

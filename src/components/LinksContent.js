@@ -1,23 +1,23 @@
-import React from 'react';
-import { Box, Text, useInput } from 'ink';
-import { exec } from 'child_process';
+import React from "react";
+import { Box, Text, useInput } from "ink";
+import { exec } from "child_process";
 
-const ACCENT = '#FF5F00';
+const ACCENT = "#FF5F00";
 
 const LINKS = [
-  { label: 'Website', url: 'https://example.com' },
-  { label: 'X', url: 'https://x.com/example' },
-  { label: 'LinkedIn', url: 'https://linkedin.com/in/example' },
-  { label: 'GitHub', url: 'https://github.com/example' },
+  { label: "Website", url: "https://example.com" },
+  { label: "X", url: "https://x.com/example" },
+  { label: "LinkedIn", url: "https://linkedin.com/in/example" },
+  { label: "GitHub", url: "https://github.com/example" },
 ];
 
 function openUrl(url) {
   const escaped = url.replace(/"/g, '\\"');
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     // Windows: use "start" to open default browser
     exec(`start "" "${escaped}"`);
-  } else if (process.platform === 'darwin') {
+  } else if (process.platform === "darwin") {
     // macOS
     exec(`open "${escaped}"`);
   } else {
@@ -30,23 +30,19 @@ function LinkItem({ label, url, isActive }) {
   return React.createElement(
     Box,
     {
-      flexDirection: 'column',
+      flexDirection: "column",
       paddingX: 1,
       paddingY: 1,
-      borderStyle: 'single',
-      borderColor: isActive ? ACCENT : 'gray',
+      borderStyle: "single",
+      borderColor: isActive ? ACCENT : "gray",
       width: 36,
     },
     React.createElement(
       Text,
-      { color: isActive ? ACCENT : 'white' },
-      (isActive ? '▶ ' : '  ') + label
+      { color: isActive ? ACCENT : "white" },
+      (isActive ? "▶ " : "  ") + label,
     ),
-    React.createElement(
-      Text,
-      { color: 'cyan' },
-      url
-    )
+    React.createElement(Text, { color: "cyan" }, url),
   );
 }
 
@@ -58,11 +54,11 @@ export default function LinksContent({ isActive }) {
       if (!isActive) return;
 
       if (key.leftArrow) {
-        setIndex((prev) => (prev === 0 ? LINKS.length - 1 : prev - 1));
+        setIndex(prev => (prev === 0 ? LINKS.length - 1 : prev - 1));
       }
 
       if (key.rightArrow) {
-        setIndex((prev) => (prev === LINKS.length - 1 ? 0 : prev + 1));
+        setIndex(prev => (prev === LINKS.length - 1 ? 0 : prev + 1));
       }
 
       if (key.return) {
@@ -74,7 +70,7 @@ export default function LinksContent({ isActive }) {
         openUrl(url);
       }
     },
-    { isActive }
+    { isActive },
   );
 
   // Arrange links in a 2x2 grid that fits within the 80-column app width:
@@ -87,7 +83,7 @@ export default function LinksContent({ isActive }) {
     rows.push(
       React.createElement(
         Box,
-        { key: `row-${i}`, flexDirection: 'row', gap: 4, marginBottom: 1 },
+        { key: `row-${i}`, flexDirection: "row", gap: 4, marginBottom: 1 },
         React.createElement(LinkItem, {
           label: first.label,
           url: first.url,
@@ -99,19 +95,19 @@ export default function LinksContent({ isActive }) {
               url: second.url,
               isActive: i + 1 === index,
             })
-          : null
-      )
+          : null,
+      ),
     );
   }
 
   return React.createElement(
     Box,
     {
-      flexDirection: 'column',
+      flexDirection: "column",
       flexGrow: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
-    ...rows
+    ...rows,
   );
 }

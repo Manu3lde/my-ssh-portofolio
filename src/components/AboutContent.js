@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text } from "ink";
-import { exec } from "child_process";
+// import { exec } from "child_process";
 
 const ACCENT = "#FF5F00";
 
@@ -36,9 +36,9 @@ const ASCII_PLACEHOLDER = `
 `;
 
 const NAME_PLACEHOLDER = `
-░█▀█░█▀▄░▀█▀░█▀█░█▀▄░▀█▀░█▀█░█▀█
-░█▀█░█▀▄░░█░░█░█░█▀▄░░█░░█▀█░█░█
-░▀░▀░▀░▀░░▀░░▀▀▀░▀░▀░▀▀▀░▀░▀░▀░▀
+ █▀█ █▀▄ ▀█▀ █▀█ █▀▄ ▀█▀ █▀█ █▀█
+ █▀█ █▀▄  █  █ █ █▀▄  █  █▀█ █ █
+ ▀ ▀ ▀ ▀  ▀  ▀▀▀ ▀ ▀ ▀▀▀ ▀ ▀ ▀ ▀
 `;
 
 const asciiLines = ASCII_PLACEHOLDER.split("\n");
@@ -61,9 +61,17 @@ export default function AboutContent() {
     },
     React.createElement(
       Box,
-
-      { flexDirection: "column", width: ASCII_WIDTH, flexShrink: 0 },
-      React.createElement(Text, { color: ACCENT }, ASCII_PLACEHOLDER),
+      {
+        flexDirection: "column",
+        width: ASCII_WIDTH,
+        flexShrink: 0,
+        flexGrow: 0,
+      },
+      React.createElement(
+        Text,
+        { color: ACCENT, wrap: "truncate" },
+        ASCII_PLACEHOLDER,
+      ),
     ),
     React.createElement(
       Box,

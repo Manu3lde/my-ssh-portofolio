@@ -1,17 +1,17 @@
-import React from 'react';
-import { Box, Text, useInput, useApp } from 'ink';
-import Spinner from 'ink-spinner';
-import Header from './components/Header.js';
-import AboutContent from './components/AboutContent.js';
-import LinksContent from './components/LinksContent.js';
-import Footer from './components/Footer.js';
+import React from "react";
+import { Box, Text, useInput, useApp } from "ink";
+import Spinner from "ink-spinner";
+import Header from "./components/Header.js";
+import AboutContent from "./components/AboutContent.js";
+import LinksContent from "./components/LinksContent.js";
+import Footer from "./components/Footer.js";
 
-const LOADING_MS = 2000;
-const ACCENT = '#FF5F00';
+const LOADING_MS = 3000;
+const ACCENT = "#FF5F00";
 
 export default function App() {
   const [loading, setLoading] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState('about');
+  const [activeTab, setActiveTab] = React.useState("about");
   const { exit } = useApp();
 
   React.useEffect(() => {
@@ -20,22 +20,29 @@ export default function App() {
   }, []);
 
   useInput((input, key) => {
-    if (input === 'q' || (key.ctrl && input === 'c')) {
+    if (input === "q" || (key.ctrl && input === "c")) {
       exit();
     }
     if (key.tab) {
-      setActiveTab((prev) => (prev === 'about' ? 'links' : 'about'));
+      setActiveTab(prev => (prev === "about" ? "links" : "about"));
     }
   });
 
   if (loading) {
     return React.createElement(
       Box,
-      { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingY: 2 },
-      React.createElement(Text, { color: ACCENT },
-        React.createElement(Spinner, { type: 'dots' }),
-        ' Loading...'
-      )
+      {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingY: 2,
+      },
+      React.createElement(
+        Text,
+        { color: ACCENT },
+        React.createElement(Spinner, { type: "dots" }),
+        " Loading...",
+      ),
     );
   }
 
@@ -46,19 +53,21 @@ export default function App() {
   return React.createElement(
     Box,
     {
-      flexDirection: 'column',
+      flexDirection: "column",
       paddingX: 2,
       paddingY: 1,
-      justifyContent: 'space-between',
+      justifyContent: "space-between",
     },
     React.createElement(Header, { activeTab }),
     React.createElement(
       Box,
       { flexGrow: 1, minHeight: 12 },
-      activeTab === 'about'
+      activeTab === "about"
         ? React.createElement(AboutContent)
-        : React.createElement(LinksContent, { isActive: activeTab === 'links' })
+        : React.createElement(LinksContent, {
+            isActive: activeTab === "links",
+          }),
     ),
-    React.createElement(Footer)
+    React.createElement(Footer),
   );
 }

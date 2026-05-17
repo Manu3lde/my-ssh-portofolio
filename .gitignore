@@ -1,3 +1,5 @@
 /node_modules
 /private.key
 /context.txt
+*.ps1
+*.exe

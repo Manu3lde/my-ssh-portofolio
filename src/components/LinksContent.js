@@ -10,10 +10,10 @@ const LINKS = [
   { label: "GitHub", url: "https://github.com/Manu3lde" },
 ];
 
-function LinkItem({ label, url, isActive }) {
+function LinkItem({ label, url, isActive, termWidth }) {
   // OSC 8 hyperlink: \u001b]8;;URL\u001b\\TEXT\u001b]8;;\u001b\\
-  // This allows the client's terminal to handle the link opening.
   const link = `\u001b]8;;${url}\u001b\\${url}\u001b]8;;\u001b\\`;
+  const itemWidth = termWidth < 80 ? Math.max(termWidth - 6, 30) : 36;
 
   return React.createElement(
     Box,
@@ -23,78 +23,45 @@ function LinkItem({ label, url, isActive }) {
       paddingY: 1,
       borderStyle: "single",
       borderColor: isActive ? ACCENT : "gray",
-      width: 36,
+      width: itemWidth,
     },
     React.createElement(
       Text,
-      { color: isActive ? ACCENT : "white" },
+      { color: isActive ? ACCENT : "white", wrap: "end" },
       (isActive ? "▶ " : "  ") + label,
     ),
-    React.createElement(Text, { color: "cyan" }, link),
+    React.createElement(Text, { color: "cyan", wrap: "anywhere" }, link),
   );
 }
 
 export default function LinksContent({ isActive }) {
   const [index, setIndex] = React.useState(0);
-  const [status, setStatus] = React.useState("Press Ctrl+Shift+Enter to copy link");
-  const { write } = useStdout();
+  const [status, setStatus] = React.useState("Use Arrows to navigate");
+  const { write, stdout } = useStdout();
+  const termWidth = (stdout && stdout.columns) || 80;
 
   useInput(
-    (_input, key) => {
+    (input, key) => {
       if (!isActive) return;
 
-      if (key.leftArrow) {
+      if (key.leftArrow || key.upArrow || input === 'k') {
         setIndex(prev => (prev === 0 ? LINKS.length - 1 : prev - 1));
-        setStatus("Press Ctrl+Shift+Enter to copy link");
       }
 
-      if (key.rightArrow) {
+      if (key.rightArrow || key.downArrow || input === 'j') {
         setIndex(prev => (prev === LINKS.length - 1 ? 0 : prev + 1));
-        setStatus("Press Ctrl+Shift+Enter to copy link");
       }
 
       if (key.return) {
-        if (key.ctrl && key.shift) {
-          const url = LINKS[index].url;
-          // OSC 52: copy to clipboard
-          // This escape sequence tells the terminal to copy text to the client's clipboard.
-          const b64 = Buffer.from(url).toString("base64");
-          write(`\u001b]52;c;${b64}\u0007`);
-          setStatus("✓ Link copied to your local clipboard!");
-        } else {
-          setStatus("Hint: Use Ctrl+Shift+Enter or Click the link");
-        }
+        const url = LINKS[index].url;
+        // OSC 52: copy to clipboard
+        const b64 = Buffer.from(url).toString("base64");
+        write(`\u001b]52;c;${b64}\u0007`);
+        setStatus("✓ Link copied to clipboard!");
       }
     },
     { isActive },
   );
-
-  // Arrange links in a 2x2 grid that fits within the 80-column app width:
-  // each card is width 36, row gap is 4 => 36 + 4 + 36 = 76.
-  const rows = [];
-  for (let i = 0; i < LINKS.length; i += 2) {
-    const first = LINKS[i];
-    const second = LINKS[i + 1];
-
-    rows.push(
-      React.createElement(
-        Box,
-        { key: `row-${i}`, flexDirection: "row", gap: 4, marginBottom: 1 },
-        React.createElement(LinkItem, {
-          label: first.label,
-          url: first.url,
-          isActive: i === index,
-        }),
-        second
-          ? React.createElement(LinkItem, {
-              label: second.label,
-              url: second.url,
-              isActive: i + 1 === index,
-            })
-          : null,
-      ),
-    );
-  }
 
   return React.createElement(
     Box,
@@ -104,7 +71,25 @@ export default function LinksContent({ isActive }) {
       justifyContent: "center",
       alignItems: "center",
     },
-    ...rows,
+    React.createElement(
+      Box,
+      {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: 2,
+        width: "100%",
+      },
+      ...LINKS.map((link, i) =>
+        React.createElement(LinkItem, {
+          key: link.label,
+          label: link.label,
+          url: link.url,
+          isActive: i === index,
+          termWidth,
+        })
+      )
+    ),
     React.createElement(
       Box,
       { marginTop: 1 },

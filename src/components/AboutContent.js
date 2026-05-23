@@ -104,6 +104,7 @@ export default function AboutContent() {
       flexDirection: "column",
       flexGrow: 1,
       alignItems: "center",
+      width: "100%",
     },
     React.createElement(
       Box,
@@ -111,6 +112,7 @@ export default function AboutContent() {
         flexDirection: "column",
         width: Math.min(ASCII_WIDTH, termWidth - 4),
         flexShrink: 0,
+        marginBottom: 1,
       },
       React.createElement(
         Text,
@@ -120,12 +122,16 @@ export default function AboutContent() {
     ),
     React.createElement(
       Box,
-      { flexDirection: "column", marginTop: 1 },
-      React.createElement(Text, { bold: true }, NAME_PLACEHOLDER),
+      { 
+        flexDirection: "column", 
+        width: Math.min(BIO_WIDTH, termWidth - 4),
+        alignItems: "center"
+      },
+      React.createElement(Text, { bold: true }, "Manu Arona"),
       React.createElement(Text, { color: ACCENT, bold: true }, "Bio"),
       React.createElement(
         Text,
-        {},
+        { textAlign: "center" },
         "Welcome to my terminal portfolio. Shaper of spells, weaver of logic.",
       ),
     ),

@@ -71,7 +71,9 @@ const server = new Server(
     keepaliveCountMax: 3,
   },
   client => {
+    console.log('Client connected!');
     client.on("authentication", ctx => {
+      console.log(`Auth attempt: user=${ctx.user}, method=${ctx.method}`);
       ctx.accept();
     });
 
@@ -170,7 +172,16 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`SSH portfolio listening on port ${PORT}`);
 
   // This will run the tunnel automatically when Render starts your app
-  const child = exec(`./bore local ${PORT} --to bore.pub`);
+  const BORE_SERVER = process.env.BORE_SERVER || 'bore.pub';
+  const BORE_SECRET = process.env.BORE_SECRET || '';
+  const BORE_REMOTE_PORT = process.env.BORE_REMOTE_PORT || '';
+  
+  let boreCmd = `./bore local ${PORT} --to ${BORE_SERVER} -l 127.0.0.1`;
+  if (BORE_REMOTE_PORT) boreCmd += ` -p ${BORE_REMOTE_PORT}`;
+  if (BORE_SECRET) boreCmd += ` -s ${BORE_SECRET}`;
+
+  console.log(`Starting bore tunnel: ${boreCmd}`);
+  const child = exec(boreCmd);
   
   child.stdout.on('data', (data) => {
     process.stdout.write(`BORE: ${data}`);
@@ -184,5 +195,13 @@ server.listen(PORT, "0.0.0.0", () => {
 
   child.stderr.on('data', (data) => {
     process.stderr.write(`BORE ERROR: ${data}`);
+  });
+
+  child.on('error', (err) => {
+    console.error('BORE process failed to start:', err);
+  });
+
+  child.on('exit', (code, signal) => {
+    console.log(`BORE process exited with code ${code} and signal ${signal}`);
   });
 });

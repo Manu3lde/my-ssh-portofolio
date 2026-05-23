@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text } from "ink";
+import { Box, Text, useStdout } from "ink";
 import Marquee from "./Marquee.js";
 
 const ACCENT = "#FF5F00";
@@ -13,9 +13,19 @@ function TabButton({ label, active }) {
 }
 
 export default function Header({ activeTab }) {
+  const { stdout } = useStdout();
+  const termWidth = (stdout && stdout.columns) || 80;
+  const isMobile = termWidth < 60;
+
   return React.createElement(
     Box,
-    { flexDirection: "row", justifyContent: "space-between", marginBottom: 1 },
+    { 
+      flexDirection: isMobile ? "column" : "row", 
+      justifyContent: "space-between", 
+      alignItems: isMobile ? "center" : "flex-start",
+      marginBottom: 1,
+      gap: isMobile ? 1 : 0
+    },
     React.createElement(
       Box,
       { flexDirection: "row", gap: 2 },
@@ -28,6 +38,10 @@ export default function Header({ activeTab }) {
         active: activeTab === "links",
       }),
     ),
-    React.createElement(Marquee),
+    React.createElement(
+      Box,
+      { width: isMobile ? "100%" : "auto", alignItems: "center" },
+      React.createElement(Marquee)
+    ),
   );
 }

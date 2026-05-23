@@ -23,7 +23,7 @@ export default function Footer() {
       React.createElement(Text, {}, "navigate"),
       React.createElement(Text, { color: ACCENT }, "t"),
       React.createElement(Text, {}, "theme"),
-      React.createElement(Text, { color: ACCENT }, "Esc"),
+      React.createElement(Text, { color: ACCENT }, "q/Esc"),
       React.createElement(Text, {}, "quit"),
     ),
   );

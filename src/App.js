@@ -20,7 +20,7 @@ export default function App() {
   }, []);
 
   useInput((input, key) => {
-    if (input === "q" || (key.ctrl && input === "c")) {
+    if (input === "q" || key.escape || (key.ctrl && input === "c")) {
       exit();
     }
     if (key.tab) {

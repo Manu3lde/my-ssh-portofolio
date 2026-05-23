@@ -5,8 +5,9 @@
   "type": "module",
   "main": "cli.js",
   "scripts": {
-    "start": "node cli.js",
-    "dev": "node cli.js"
+    "start": "node server.js",
+    "dev": "node cli.js",
+    "postinstall": "chmod +x bore || true"
   },
   "dependencies": {
     "ink": "^5.0.0",

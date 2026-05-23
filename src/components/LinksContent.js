@@ -1,32 +1,20 @@
 import React from "react";
-import { Box, Text, useInput } from "ink";
-import { exec } from "child_process";
+import { Box, Text, useInput, useStdout } from "ink";
 
 const ACCENT = "#FF5F00";
 
 const LINKS = [
   { label: "Website", url: "https://example.com" },
-  { label: "X", url: "https://x.com/example" },
+  { label: "X", url: "https://x.com/manu_3ll" },
   { label: "LinkedIn", url: "https://linkedin.com/in/example" },
-  { label: "GitHub", url: "https://github.com/example" },
+  { label: "GitHub", url: "https://github.com/Manu3lde" },
 ];
 
-function openUrl(url) {
-  const escaped = url.replace(/"/g, '\\"');
-
-  if (process.platform === "win32") {
-    // Windows: use "start" to open default browser
-    exec(`start "" "${escaped}"`);
-  } else if (process.platform === "darwin") {
-    // macOS
-    exec(`open "${escaped}"`);
-  } else {
-    // Linux and others
-    exec(`xdg-open "${escaped}"`);
-  }
-}
-
 function LinkItem({ label, url, isActive }) {
+  // OSC 8 hyperlink: \u001b]8;;URL\u001b\\TEXT\u001b]8;;\u001b\\
+  // This allows the client's terminal to handle the link opening.
+  const link = `\u001b]8;;${url}\u001b\\${url}\u001b]8;;\u001b\\`;
+
   return React.createElement(
     Box,
     {
@@ -42,12 +30,14 @@ function LinkItem({ label, url, isActive }) {
       { color: isActive ? ACCENT : "white" },
       (isActive ? "▶ " : "  ") + label,
     ),
-    React.createElement(Text, { color: "cyan" }, url),
+    React.createElement(Text, { color: "cyan" }, link),
   );
 }
 
 export default function LinksContent({ isActive }) {
   const [index, setIndex] = React.useState(0);
+  const [status, setStatus] = React.useState("Press Ctrl+Shift+Enter to copy link");
+  const { write } = useStdout();
 
   useInput(
     (_input, key) => {
@@ -55,19 +45,25 @@ export default function LinksContent({ isActive }) {
 
       if (key.leftArrow) {
         setIndex(prev => (prev === 0 ? LINKS.length - 1 : prev - 1));
+        setStatus("Press Ctrl+Shift+Enter to copy link");
       }
 
       if (key.rightArrow) {
         setIndex(prev => (prev === LINKS.length - 1 ? 0 : prev + 1));
+        setStatus("Press Ctrl+Shift+Enter to copy link");
       }
 
       if (key.return) {
-        const url = LINKS[index].url;
-        // Log to terminal for feedback and open in default browser
-        // (Ink will re-render after this console.log, which is fine for a simple app.)
-        // eslint-disable-next-line no-console
-        console.log(`Opening URL: ${url}`);
-        openUrl(url);
+        if (key.ctrl && key.shift) {
+          const url = LINKS[index].url;
+          // OSC 52: copy to clipboard
+          // This escape sequence tells the terminal to copy text to the client's clipboard.
+          const b64 = Buffer.from(url).toString("base64");
+          write(`\u001b]52;c;${b64}\u0007`);
+          setStatus("✓ Link copied to your local clipboard!");
+        } else {
+          setStatus("Hint: Use Ctrl+Shift+Enter or Click the link");
+        }
       }
     },
     { isActive },
@@ -109,5 +105,10 @@ export default function LinksContent({ isActive }) {
       alignItems: "center",
     },
     ...rows,
+    React.createElement(
+      Box,
+      { marginTop: 1 },
+      React.createElement(Text, { color: "gray" }, status),
+    ),
   );
 }

@@ -7,7 +7,11 @@ import { render } from "ink";
 import App from "./src/App.js";
 
 const { Server } = ssh2;
-const HOST_KEY = readFileSync("./private.key");
+
+// Use SSH_HOST_KEY env var if available, otherwise fall back to local file
+const HOST_KEY = process.env.SSH_HOST_KEY 
+  ? process.env.SSH_HOST_KEY 
+  : readFileSync("./private.key");
 
 /**
  * Wrap a duplex SSH stream so that every \n in outgoing writes becomes \r\n.
@@ -146,12 +150,13 @@ const server = new Server(
   },
 );
 
-server.listen(22222, "0.0.0.0", () => {
-  console.log("SSH portfolio listening on port 22222");
+const PORT = process.env.SSH_PORT || 22222;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`SSH portfolio listening on port ${PORT}`);
 
   // This will run the tunnel automatically when Render starts your app
-  // Using 22222 to match the local port above
-  exec('./bore local 22222 --to bore.pub', (err, stdout, stderr) => {
+  exec(`./bore local ${PORT} --to bore.pub`, (err, stdout, stderr) => {
     if (err) console.error(err);
     if (stderr) console.error(stderr);
     console.log(stdout);

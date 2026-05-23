@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { EventEmitter } from "events";
 import { exec } from "child_process";
+import http from "http";
 import ssh2 from "ssh2";
 import React from "react";
 import { render } from "ink";
@@ -151,6 +152,17 @@ const server = new Server(
 );
 
 const PORT = process.env.SSH_PORT || 22222;
+
+// --- Render Health Check Hack ---
+// Render Web Services expect an HTTP server to be listening on process.env.PORT
+const HTTP_PORT = process.env.PORT || 10000;
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('SSH Server is running\n');
+}).listen(HTTP_PORT, '0.0.0.0', () => {
+  console.log(`Health check HTTP server listening on port ${HTTP_PORT}`);
+});
+// --------------------------------
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`SSH portfolio listening on port ${PORT}`);

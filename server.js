@@ -71,7 +71,14 @@ const server = new Server(
     keepaliveCountMax: 3,
   },
   client => {
-    client.on("authentication", ctx => ctx.accept());
+    client.on("authentication", ctx => {
+      // Accept any password or public key
+      if (ctx.method === 'password' || ctx.method === 'publickey' || ctx.method === 'none') {
+        ctx.accept();
+      } else {
+        ctx.reject(['password', 'publickey']);
+      }
+    });
 
     client.on("session", accept => {
       const session = accept();

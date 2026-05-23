@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { EventEmitter } from "events";
+import { exec } from "child_process";
 import ssh2 from "ssh2";
 import React from "react";
 import { render } from "ink";
@@ -145,6 +146,14 @@ const server = new Server(
   },
 );
 
-server.listen(2222, "0.0.0.0", () => {
-  console.log("SSH portfolio listening on port 2222");
+server.listen(22222, "0.0.0.0", () => {
+  console.log("SSH portfolio listening on port 22222");
+
+  // This will run the tunnel automatically when Render starts your app
+  // Using 22222 to match the local port above
+  exec('./bore local 22222 --to bore.pub', (err, stdout, stderr) => {
+    if (err) console.error(err);
+    if (stderr) console.error(stderr);
+    console.log(stdout);
+  });
 });

@@ -19,11 +19,11 @@ export default function Footer() {
     React.createElement(
       Box,
       { flexDirection: "row", gap: 2 },
-      React.createElement(Text, { color: ACCENT }, "n"),
+      React.createElement(Text, { color: ACCENT }, "Tab"),
       React.createElement(Text, {}, "navigate"),
       React.createElement(Text, { color: ACCENT }, "t"),
       React.createElement(Text, {}, "theme"),
-      React.createElement(Text, { color: ACCENT }, "q"),
+      React.createElement(Text, { color: ACCENT }, "Esc"),
       React.createElement(Text, {}, "quit"),
     ),
   );

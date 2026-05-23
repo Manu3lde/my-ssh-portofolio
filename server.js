@@ -72,12 +72,7 @@ const server = new Server(
   },
   client => {
     client.on("authentication", ctx => {
-      // Accept any password or public key
-      if (ctx.method === 'password' || ctx.method === 'publickey' || ctx.method === 'none') {
-        ctx.accept();
-      } else {
-        ctx.reject(['password', 'publickey']);
-      }
+      ctx.accept();
     });
 
     client.on("session", accept => {
@@ -175,9 +170,19 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`SSH portfolio listening on port ${PORT}`);
 
   // This will run the tunnel automatically when Render starts your app
-  exec(`./bore local ${PORT} --to bore.pub`, (err, stdout, stderr) => {
-    if (err) console.error(err);
-    if (stderr) console.error(stderr);
-    console.log(stdout);
+  const child = exec(`./bore local ${PORT} --to bore.pub`);
+  
+  child.stdout.on('data', (data) => {
+    process.stdout.write(`BORE: ${data}`);
+    if (data.includes('listening at')) {
+      console.log('\n' + '='.repeat(50));
+      console.log('>>> YOUR PUBLIC SSH ADDRESS IS BELOW <<<');
+      console.log(data.trim());
+      console.log('='.repeat(50) + '\n');
+    }
+  });
+
+  child.stderr.on('data', (data) => {
+    process.stderr.write(`BORE ERROR: ${data}`);
   });
 });

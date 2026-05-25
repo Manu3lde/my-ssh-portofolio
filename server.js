@@ -176,7 +176,8 @@ server.listen(PORT, "0.0.0.0", () => {
   const BORE_SECRET = process.env.BORE_SECRET || '';
   const BORE_REMOTE_PORT = process.env.BORE_REMOTE_PORT || '';
   
-  let boreCmd = `./bore local ${PORT} --to ${BORE_SERVER} -l 127.0.0.1`;
+  const boreBin = process.platform === 'win32' ? 'bore.exe' : './bore';
+  let boreCmd = `${boreBin} local ${PORT} --to ${BORE_SERVER} -l 127.0.0.1`;
   if (BORE_REMOTE_PORT) boreCmd += ` -p ${BORE_REMOTE_PORT}`;
   if (BORE_SECRET) boreCmd += ` -s ${BORE_SECRET}`;
 

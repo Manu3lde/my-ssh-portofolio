@@ -72,6 +72,11 @@ const server = new Server(
   },
   client => {
     console.log('Client connected!');
+    
+    client.on("error", err => {
+      console.log(`Client error: ${err.message}`);
+    });
+
     client.on("authentication", ctx => {
       console.log(`Auth attempt: user=${ctx.user}, method=${ctx.method}`);
       ctx.accept();
@@ -167,6 +172,10 @@ http.createServer((req, res) => {
   console.log(`Health check HTTP server listening on port ${HTTP_PORT}`);
 });
 // --------------------------------
+
+server.on('error', (err) => {
+  console.error('SSH Server error:', err);
+});
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`SSH portfolio listening on port ${PORT}`);

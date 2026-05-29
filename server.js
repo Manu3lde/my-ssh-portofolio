@@ -190,28 +190,33 @@ server.listen(PORT, "0.0.0.0", () => {
   if (BORE_REMOTE_PORT) boreCmd += ` -p ${BORE_REMOTE_PORT}`;
   if (BORE_SECRET) boreCmd += ` -s ${BORE_SECRET}`;
 
-  console.log(`Starting bore tunnel: ${boreCmd}`);
-  const child = exec(boreCmd);
-  
-  child.stdout.on('data', (data) => {
-    process.stdout.write(`BORE: ${data}`);
-    if (data.includes('listening at')) {
-      console.log('\n' + '='.repeat(50));
-      console.log('>>> YOUR PUBLIC SSH ADDRESS IS BELOW <<<');
-      console.log(data.trim());
-      console.log('='.repeat(50) + '\n');
-    }
-  });
+  function startBoreTunnel() {
+    console.log(`Starting/restarting bore tunnel: ${boreCmd}`);
+    const child = exec(boreCmd);
+    
+    child.stdout.on('data', (data) => {
+      process.stdout.write(`BORE: ${data}`);
+      if (data.includes('listening at')) {
+        console.log('\n' + '='.repeat(50));
+        console.log('>>> YOUR PUBLIC SSH ADDRESS IS BELOW <<<');
+        console.log(data.trim());
+        console.log('='.repeat(50) + '\n');
+      }
+    });
 
-  child.stderr.on('data', (data) => {
-    process.stderr.write(`BORE ERROR: ${data}`);
-  });
+    child.stderr.on('data', (data) => {
+      process.stderr.write(`BORE ERROR: ${data}`);
+    });
 
-  child.on('error', (err) => {
-    console.error('BORE process failed to start:', err);
-  });
+    child.on('error', (err) => {
+      console.error('BORE process failed to start:', err);
+    });
 
-  child.on('exit', (code, signal) => {
-    console.log(`BORE process exited with code ${code} and signal ${signal}`);
-  });
+    child.on('exit', (code, signal) => {
+      console.log(`BORE process exited with code ${code} and signal ${signal}. Retrying in 5 seconds...`);
+      setTimeout(startBoreTunnel, 5000);
+    });
+  }
+
+  startBoreTunnel();
 });
